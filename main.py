@@ -97,6 +97,31 @@ def check_sting(text):
         raise ValueError("entry must end on its sharpening last words")
 
 
+def check_sting_in_second_half(text):
+    # Judge criterion 5: the review lands fast, then sharpens at the
+    # end -- the sharpening turn must start well into the text, after
+    # the setup ("held my taxes together for four years"), so the
+    # setup lands before the punch.
+    turn = "and is the only thing in this office with its life in order."
+    idx = text.lower().find(turn)
+    if idx < 0:
+        raise ValueError("entry is missing its sharpening turn")
+    if idx < len(text) // 3:
+        raise ValueError(
+            "sharpening turn starts too early; the review must land "
+            "fast and sharpen at the end"
+        )
+
+
+def check_object_is_subject(text):
+    # Judge criterion 1: the joke stays about the object, not the
+    # reviewer -- the review must open on the object itself.
+    if not text.startswith("This paperclip"):
+        raise ValueError(
+            "entry must open on the object itself: 'This paperclip'"
+        )
+
+
 def validate_structure(text):
     """Gates: well-formed UTF-8 text, in range, one line."""
     check_is_text(text)
@@ -109,9 +134,11 @@ def validate_structure(text):
 def validate_voice(text):
     """Judge brief: on-subject object, real detail, true, sharp ending."""
     check_object(text)
+    check_object_is_subject(text)
     check_real_detail(text)
     check_no_generic_jokes(text)
     check_sting(text)
+    check_sting_in_second_half(text)
 
 
 def validate(text):
